@@ -1,4 +1,5 @@
 node_modules
 .idea
-/config/dev.ts
-/models/jwtPrivateKey.ts
+.eslintrc.js
+/server/config/dev.js
+/server/models/jwtPrivateKey.js

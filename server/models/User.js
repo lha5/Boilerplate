@@ -3,6 +3,8 @@ const bcrpyt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 
+const privateKey = require('./jwtPrivateKey');
+
 const userSchema = mongoose.Schema({
     name: {
         type: String,
@@ -32,7 +34,9 @@ const userSchema = mongoose.Schema({
     }
 }, { timestamps: true });
 
+
 userSchema.pre('save', function (next) {
+    // @ts-ignore
     let user = this;
 
     if (user.idModified('password')) {
@@ -63,6 +67,25 @@ userSchema.methods.comparePassword = function (plainPassword, cb) {
 userSchema.methods.generateToken = function (cb) {
     let user = this;
     let token = jwt.sign(user._id.toHexString(), privateKey);
+
+    user.token = token;
+    user.save(function (err, user) {
+        if (err) {return cb(err);}
+
+        cb(null, user);
+    });
+};
+
+userSchema.statics.findByToken = function (token, cb) {
+    let user = this;
+
+    jwt.verify(token, privateKey, function (err, decode) {
+        user.findOne({ "_id": decode, "token": token }, function (err, user) {
+            if (err) {return cb(err);}
+
+            cb(null, user);
+        });
+    });
 };
 
 const User = mongoose.model('User', userSchema);

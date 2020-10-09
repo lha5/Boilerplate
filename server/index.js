@@ -1,15 +1,15 @@
-import express = require('express');
+const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 let app = express();
-import { Request, Response } from 'express';
 
 const config = require('./config/key');
 
 mongoose
-    .connect(config.mongoURI,
+    .connect(
+        config.mongoURI,
         {
             useNewUrlParser: true,
             useUnifiedTopology: true,
@@ -23,10 +23,27 @@ mongoose
 app.use(bodyParser.urlencoded({ extended: true }));
 // application/json
 app.use(bodyParser.json());
+app.use(cookieParser());
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (req, res) => {
     res.send('Hello World!');
 });
+
+// using API
+app.use('/api/user', require('./routes/user'));
+
+// Serve static assets if in production
+if (process.env.NODE_ENV === "production") {
+
+    // Set static folder
+    // All the javascript and css files will be read and served from this folder
+    app.use(express.static("client/build"));
+
+    // index.html for all page routes    html or routing and naviagtion
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "../client", "build", "index.html"));
+    });
+}
 
 const port = 5000;
 app.listen(port, () => {
