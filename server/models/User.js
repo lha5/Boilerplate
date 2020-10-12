@@ -3,7 +3,7 @@ const bcrpyt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 
-const privateKey = require('./jwtPrivateKey');
+const privateKey = require('./jwtPrivateKey').privateKey;
 
 const userSchema = mongoose.Schema({
     name: {

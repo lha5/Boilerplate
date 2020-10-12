@@ -54,7 +54,7 @@ router.post('/signin', (req, res) => {
     User.findOne({'email': req.body.email}, (err, user) => {
         if (!user) {
             return res.json({
-                loginSuccess: false,
+                signInSuccess: false,
                 message: "Auth failed, email is not founded."
             });
         }
@@ -62,7 +62,7 @@ router.post('/signin', (req, res) => {
         user.comparePassword(req.body.password, (err, isMatch) => {
             if (!isMatch) {
                 return res.json({
-                    loginSuccess: false,
+                    signInSuccess: false,
                     message: "Wrong password"
                 });
             }
@@ -77,7 +77,7 @@ router.post('/signin', (req, res) => {
                     .cookie("w_auth", user.token, {httpOnly: true})
                     .status(200)
                     .json({
-                        loginSuccess: true,
+                        signInSuccess: true,
                         userId: user._id
                     });
             });
@@ -90,7 +90,7 @@ router.get('/logout', auth, (req, res) => {
         if (err) {
             return res.json({success: false, err});
         }
-
+        res.clearCookie('w_authExp');
         return res.clearCookie('w_auth').status(200).send({
             success: true
         });
